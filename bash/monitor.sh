@@ -5,6 +5,7 @@
 MESSAGES_FILE=/tmp/kafka_messages.txt
 MAX_COMP_TIME_MIN=120
 
+echo "-----------------------------"
 date
 
 # read secrets from file
@@ -37,8 +38,11 @@ echo "NOW_EPOCH: ${NOW_EPOCH}"
 LAST_READING_SEC=`expr ${NOW_EPOCH} - ${LAST_READING_EPOCH}`
 echo "LAST_READING_SEC: ${LAST_READING_SEC}"
 
-# if last reading is older than 1min ago (which is how often this script is supposed to run) then let's assume the computer is off
-if [ ${LAST_READING_SEC} -gt 60 ]; then
+# if last reading is older than 1min ago (trick is this script is supposed to run every 10min) then let's assume the computer is off
+# if comparing to 60 then I can miss some activity, but there is no false positive
+# if comparing to 600 then I do not miss on any activity, but there is a 10min window of false positive
+# deciding now to 300 as with 60 I missed some of his short activities
+if [ ${LAST_READING_SEC} -gt 300 ]; then
   echo "No need to shout now, he is not there any more. Exiting."
   exit 0
 else
