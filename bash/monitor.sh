@@ -17,7 +17,11 @@ if [ -z "${SLACK_WEBHOOK}" ]; then
 fi
 
 # get messages
-/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server :9092 --topic activity_desktop-adas --from-beginning --timeout-ms 2000 > ${MESSAGES_FILE} 2>&1
+#/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server :9092 --topic activity_desktop-adas --from-beginning --timeout-ms 2000 > ${MESSAGES_FILE} 2>&1
+
+# get messages from two topics
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server :9092 --whitelist 'activity_desktop-adas|activity_laptop_adasia' --from-beginning --timeout-ms 4000  > ${MESSAGES_FILE} 2>&1
+
 
 # check if there were new messages in the last 2 min, if yes that means Adas is still sitting behind the computer and ignores my ask to do something else
 LAST_READING=`cat ${MESSAGES_FILE} | grep ${DATE_I} | grep -v "ERROR" | tail -1 | awk '{print $2}' | tr -d "," | tr -d '"'`
