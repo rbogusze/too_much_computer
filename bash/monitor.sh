@@ -24,7 +24,7 @@ fi
 
 
 # check if there were new messages in the last 2 min, if yes that means Adas is still sitting behind the computer and ignores my ask to do something else
-LAST_READING=`cat ${MESSAGES_FILE} | grep ${DATE_I} | grep -v "ERROR" | tail -1 | awk '{print $2}' | tr -d "," | tr -d '"'`
+LAST_READING=`cat ${MESSAGES_FILE} | grep ${DATE_I} | grep -v "ERROR" | sort -k2 | tail -1 | awk '{print $2}' | tr -d "," | tr -d '"'`
 
 # if there are no messages from today let's set last message as from yesterday
 if [ -z "${LAST_READING}" ]; then
