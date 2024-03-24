@@ -20,11 +20,12 @@ fi
 #/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server :9092 --topic activity_desktop-adas --from-beginning --timeout-ms 2000 > ${MESSAGES_FILE} 2>&1
 
 # get messages from two topics
-/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server :9092 --whitelist 'activity_desktop-adas|activity_laptop_adasia' --from-beginning --timeout-ms 4000  > ${MESSAGES_FILE} 2>&1
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server :9092 --whitelist 'activity_desktop-adas|activity_laptop_adasia|activity_laptop-adasia' --from-beginning --timeout-ms 4000  > ${MESSAGES_FILE} 2>&1
 
 
 # check if there were new messages in the last 2 min, if yes that means Adas is still sitting behind the computer and ignores my ask to do something else
 LAST_READING=`cat ${MESSAGES_FILE} | grep ${DATE_I} | grep -v "ERROR" | sort -k2 | tail -1 | awk '{print $2}' | tr -d "," | tr -d '"'`
+echo "LAST_READING: ${LAST_READING}"
 
 # if there are no messages from today let's set last message as from yesterday
 if [ -z "${LAST_READING}" ]; then
@@ -33,7 +34,6 @@ if [ -z "${LAST_READING}" ]; then
 else
   echo "looks like he played today already"
 fi
-echo "LAST_READING: ${LAST_READING}"
 
 LAST_READING_EPOCH=`date -d ${LAST_READING} +"%s"`
 echo "LAST_READING_EPOCH: ${LAST_READING_EPOCH}"
