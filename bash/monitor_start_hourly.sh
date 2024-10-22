@@ -37,7 +37,7 @@ do
   REPORTED_TIMESTAMP="${V_WHO}_`date '+%Y-%m-%d--%H'`"
   echo "REPORTED_TIMESTAMP: ${REPORTED_TIMESTAMP}"
   if [ -f /tmp/${REPORTED_TIMESTAMP} ]; then
-    echo "File exists. Doint nothing, that was already reported"
+    echo "File exists. Doing nothing, that was already reported"
   else
     echo "File does not exists. Reporting this activity and creating a file"
     curl -X POST --data-urlencode "payload={\"channel\": \"#monitoring\", \"username\": \"computer_monitor\", \"text\": \"Computer $V_WHO is working on ${REPORTED_TIMESTAMP}.\", \"icon_emoji\": \":ghost:\"}" ${SLACK_WEBHOOK}
