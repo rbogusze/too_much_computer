@@ -3,6 +3,7 @@
 # This script should be run every 1 min, it send monitoring messages when some activity starts happening on the activity_.* topics, which means someone started the PC, done to catch Natalia playing without consent
 
 MESSAGES_FILE=/tmp/monitor_start_hourly.txt
+echo "MESSAGES_FILE: $MESSAGES_FILE"
 
 echo "-----------------------------"
 date
@@ -18,7 +19,7 @@ fi
 
 echo "listen for 55s and read any new messages, hm, not sure why timeout-ms 20000 feels like 1min"
 echo "MESSAGES_FILE: $MESSAGES_FILE"
-#/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 192.168.1.104:9092 --whitelist 'activity_.*' --timeout-ms 20000 > ${MESSAGES_FILE} 2>&1
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 192.168.1.104:9092 --whitelist 'activity_.*' --timeout-ms 20000 > ${MESSAGES_FILE} 2>&1
 date
 
 echo "Some basic filtering"
