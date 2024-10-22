@@ -10,21 +10,22 @@ date
 
 # read secrets from file
 source ~/.monitor_secrets.txt
-DATE_I=`date -I`
 
 if [ -z "${SLACK_WEBHOOK}" ]; then
   echo "SLACK_WEBHOOK variable that should be taken from ~/.monitor_secrets.txt is not defined. Exiting."
   exit 1
 fi
 
-echo "listen for 55s and read any new messages, hm, not sure why timeout-ms 20000 feels like 1min"
+
+TIMEOUT=15000
+echo "listen for 55s and read any new messages, hm, not sure why timeout-ms $TIMEOUT feels like 1min"
 echo "MESSAGES_FILE: $MESSAGES_FILE"
-/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 192.168.1.104:9092 --whitelist 'activity_.*' --timeout-ms 20000 > ${MESSAGES_FILE} 2>&1
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 192.168.1.104:9092 --whitelist 'activity_.*' --timeout-ms $TIMEOUT > ${MESSAGES_FILE} 2>&1
 date
 
 echo "Some basic filtering"
 MESSAGES_FILE_F1=/tmp/monitor_start_hourly_f1.txt
-cat ${MESSAGES_FILE} | grep send_time | grep -v "Hello there from" > ${MESSAGES_FILE_F1}
+cat ${MESSAGES_FILE} | grep --text send_time | grep --text -v "Hello there from" > ${MESSAGES_FILE_F1}
 
 echo "Reading each line:"
 while read LINE
@@ -36,7 +37,7 @@ do
   echo "Was that reported in last hour?"
   REPORTED_TIMESTAMP="${V_WHO}_`date '+%Y-%m-%d--%H'`"
   echo "REPORTED_TIMESTAMP: ${REPORTED_TIMESTAMP}"
-  if [ -f /tmp/${REPORTED_TIMESTAMP} ]; then
+  if [ -f "/tmp/${REPORTED_TIMESTAMP}" ]; then
     echo "File exists. Doing nothing, that was already reported"
   else
     echo "File does not exists. Reporting this activity and creating a file"
