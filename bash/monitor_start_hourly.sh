@@ -16,11 +16,35 @@ if [ -z "${SLACK_WEBHOOK}" ]; then
   exit 1
 fi
 
-
-TIMEOUT=15000
-echo "listen for 55s and read any new messages, hm, not sure why timeout-ms $TIMEOUT feels like 1min"
 echo "MESSAGES_FILE: $MESSAGES_FILE"
-/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 192.168.1.104:9092 --whitelist 'activity_.*' --timeout-ms $TIMEOUT > ${MESSAGES_FILE} 2>&1
+
+#TIMEOUT=15000
+#echo "listen for 55s and read any new messages, hm, not sure why timeout-ms $TIMEOUT feels like 1min"
+#/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 192.168.1.104:9092 --whitelist 'activity_.*' --timeout-ms $TIMEOUT > ${MESSAGES_FILE} 2>&1
+
+SLEEP_SEC=550
+echo "Running consume from kafka topics, output to ${MESSAGES_FILE} and sleeping for $SLEEP_SEC"
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server 192.168.1.104:9092 --whitelist 'activity_.*' > ${MESSAGES_FILE} 2>&1 &
+CONSUMER_PID=$!
+echo "CONSUMER_PID: $CONSUMER_PID"
+ps -ef | grep $CONSUMER_PID
+
+sleep 1
+
+echo "Sleeping for $SLEEP_SEC"
+sleep $SLEEP_SEC
+
+echo "Killing the kafka-console-consumer.sh command"
+kill $CONSUMER_PID
+sleep 1
+kill -9 $CONSUMER_PID
+
+sleep 1
+ps -ef | grep $CONSUMER_PID
+
+echo "THis is what I received:"
+cat ${MESSAGES_FILE}
+
 date
 
 echo "Some basic filtering"
